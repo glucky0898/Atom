@@ -10,7 +10,7 @@
 
 
 
-# Atom 快捷鍵
+# Atom快捷鍵
 
 ctrl+p/t 搜索項目文件
 全局搜索：ctrl + Shift + F
