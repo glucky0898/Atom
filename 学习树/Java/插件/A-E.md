@@ -28,7 +28,3 @@
 #### BeanUtils
   > public static void copyProperties(Object dest, Object orig) 如果存在名称不相同
    的属性，则BeanUtils不对那些属性进行处理
-
-#### Junit
- > @RunWith(value = SpringJUnit4ClassRunner.class) 在使用所有注释前必须使用，让测试运行于Spring测试环境
-  @ContextConfiguration(locations = {"classpath:spring-ds.xml"}) 用来指定加载的Spring配置文件的位置,会加载指定 Spring 配置文件所在的位置
