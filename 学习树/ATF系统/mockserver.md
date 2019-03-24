@@ -163,6 +163,28 @@ String recordedExpectations = new MockServerClient("localhost", 1080)
         }
     }
 ```
+```java
+//参数
+* @param contextPath the context path that the MockServer war is deployed to
+* /**
+     * Start the client communicating to a MockServer at the specified host and port
+     * and contextPath for example:
+     *
+     * MockServerClient mockServerClient = new MockServerClient("localhost", 1080, "/mockserver");
+     *
+     * @param host        the host for the MockServer to communicate with
+     * @param port        the port for the MockServer to communicate with
+     * @param contextPath the context path that the MockServer war is deployed to
+     */
+    public MockServerClient(String host, int port, String contextPath)
+* MockServerClient.java  the client communicating to a MockServer,makes HTTP requests to a remote MockServer instance
+* ClientAndServer.java extends MockServerClient starts a local MockServer instance and makes HTTP requests to it
+```
+
+
+
+
+
 // 处理方法
 ```java
 /**
@@ -174,5 +196,53 @@ String recordedExpectations = new MockServerClient("localhost", 1080)
     public MockServerClient clear(HttpRequest httpRequest, ClearType type) {
         sendRequest(request().withMethod("PUT").withPath(calculatePath("clear")).withQueryStringParameter("type", type.name().toLowerCase()).withBody(httpRequest != null ? httpRequestSerializer.serialize(httpRequest) : "", StandardCharsets.UTF_8));
         return clientClass.cast(this);
+    }
+     public void clear() {
+        new MockServerClient("localhost", 1080).clear(
+            request()
+                .withPath("/some/path")
+                .withMethod("POST")
+        );
+    }
+    public void createExpectationMockServerClient() {
+        new MockServerClient("localhost", 1080)
+            .when(
+                request()
+                    .withMethod("GET")
+                    .withPath("/view/cart")
+                    .withCookies(
+                        cookie("session", "4930456C-C718-476F-971F-CB8E047AB349")
+                    )
+                    .withQueryStringParameters(
+                        param("cartId", "055CA455-1DF7-45BB-8535-4F83E7266092")
+                    )
+            )
+            .respond(
+                response()
+                    .withBody("some_response_body")
+            );
+    }
+//
+MockServerMatcher.java
+public synchronized void add(Expectation expectation) {
+        this.httpRequestMatchers.add(this.matcherBuilder.transformsToMatcher(expectation));
+        this.notifyListeners(this);
+    }
+public void clear(HttpRequest httpRequest) {
+        if (httpRequest != null) {
+            HttpRequestMatcher clearHttpRequestMatcher = this.matcherBuilder.transformsToMatcher(httpRequest);
+            Iterator i$ = this.cloneMatchers().iterator();
+
+            while(i$.hasNext()) {
+                HttpRequestMatcher httpRequestMatcher = (HttpRequestMatcher)i$.next();
+                if (clearHttpRequestMatcher.matches(httpRequestMatcher.getExpectation().getHttpRequest()) && this.httpRequestMatchers.contains(httpRequestMatcher)) {
+                    this.httpRequestMatchers.remove(httpRequestMatcher);
+                    this.notifyListeners(this);
+                }
+            }
+        } else {
+            this.reset();
+        }
+
     }
 ```
