@@ -28,6 +28,10 @@ parameterType="com.chenzhou.mybatis.User" 这个属性指向传递的参数实�
  	</insert>
 	```
  - [链接:返回值问题](https://www.cnblogs.com/xingyunblog/p/6243179.html)
-
+	```java
 	<insert id="insert" parameterType="HttpRequestEntity" useGeneratedKeys="true" keyProperty="id">
-> useGeneratedKeys="true" keyProperty="id" 组合，把产生的主键[useGeneratedKeys="true"]放入到实体类属性名的id[keyProperty="id"]中
+	useGeneratedKeys="true" keyProperty="id" 组合，把产生的主键[useGeneratedKeys="true"]放入到实体类属性名的id[keyProperty="id"]中
+	```
+
+### 属性为集合、对象
+- [实例](https://blog.csdn.net/new_huiyuan/article/details/74748715)
