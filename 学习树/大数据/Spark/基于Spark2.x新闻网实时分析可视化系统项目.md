@@ -27,7 +27,12 @@
 - hdfs zkfc -formatZK
   INFO zookeeper.ClientCnxn: Opening socket connection to server node6/192.168.226.132:2181. Will not attempt to authenticate using SASL (unknown error)
   19/06/30 22:06:37 WARN zookeeper.ClientCnxn: Session 0x0 for server null, unexpected error, closing socket connection and attempting reconnect java.net.ConnectException: 拒绝连接
+
   > 进入 zookeeper/bin ./zkServer.sh start 启动每个 service 的 zookeeper 服务
+
+- hdfs datanode secondarynamenode(由第二个 namenode 代替了)
+- 两个 namenode 都是 standby
+  > zookeeper 都开启了 hdfs zkfc -formatZK stop-dfs.sh start-dfs.sh 就好了
 
 ## 1. Zookeeper 分布式集群部署
 
@@ -442,7 +447,46 @@ public class ReadWrite {
 
 - 编写 flume 的 shell
 
+```sh
+#/bin/bash
+echo "flume-1 start ......"
+bin/flume-ng agent -c conf -f conf/flume-conf.properties -n a2 -Dflume.root.logger=INFO,console
+#1.agent run a Flume agent 2.--conf,-c <conf> use configs in <conf> directory  3.--conf-file,-f  specify a config file (required)
+```
+
 ### 出错
 
 - 运行 jar 文件 Invalid or corrupt jarfile 错误
   > idea 打包错误,application 需要选 Main class 生成的 jar 里有 MF 文件 记录 main 程序名称和依赖的 jar 包
+- vim 打开文件，乱码
+  > vim /etc/vim/vimrc
+  > set fileencodings=utf-8,gb2312,gbk,gb18030  
+  >  set termencoding=utf-8  
+  >  set encoding=prc
+- 启动 flume 脚本或查看 flume-ng version 报 Error: Could not find or load main class org.apache.flume.tools.GetJavaProperty
+
+  > 安装了 hbase 就会这个错
+  > 将 hbase 的 hbase.env.sh 的一行配置注释掉:export HBASE_CLASSPATH=/home/hadoop/hbase/conf 或者改成 export JAVA_CLASSPATH=.:$JAVA_HOME/lib/dt.jar:$JAVA_HOME/lib/tools.jar
+
+- kafka 创建消费者报错 consumer zookeeper is not a recognized option
+  > 0.90 版本之前启动消费者 bin/kafka-console-consumer.sh --zookeeper 192.168.0.140:2181,192.168.0.141:2181 --topic test --from-beginning
+  > 0.90 版本之后启动消费者的方法： bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic test --from-beginning
+- 删除 zookeeper 的 datadir 中的 data 目录 创建 myid 后 重启 zookeeper 报错 load database on disk zookeeper IOException:No snapshot found, but there are log entries. Something is broken!
+
+  > 需要删除 logs 因为有 snapshot
+
+  启动顺序 1.启动 zookeeper node5/6/7 2.启动 node5/6/7/8 journalnode 启动 node5 hdfs start-all.sh 单独启动 node8 的 yarn 3.启动 kafka node5/6/7(不然无法--replication-factor 3)
+
+### jps 结果
+
+> 7105 DFSZKFailoverController
+> 33825 Application
+> 7347 NameNode
+> 34851 Jps
+> 26644 Application
+> 10740 HMaster
+> 10916 HRegionServer
+> 8039 ResourceManager
+> 2439 QuorumPeerMain
+> 33434 Kafka
+> 11274 Main
