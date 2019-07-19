@@ -12,7 +12,7 @@
   > 需要在 zoo.cfg 中的 dataDir=/usr/zookeeper/data 的路径 data 下创建 myid 文件
   > ./zkServer.sh status 查看状态 server.1 的 Mode: leader 其他显示为 follower
 
-- Hadoop HA setup : not able to connect to zookeeper Session 0x0 for server null, unexpected error, closing socket connection and attempting reconnect java.net.ConnectException: Connection refused\
+- Hadoop HA setup : not able to connect to zookeeper Session 0x0 for server null, unexpected error, closing socket connection and attempting reconnect java.net.ConnectException: Connection refused
 
   > Change this in zoo.cfg:
   > server.1=192.168.13.134:2888:3888
@@ -490,3 +490,11 @@ bin/flume-ng agent -c conf -f conf/flume-conf.properties -n a2 -Dflume.root.logg
 > 2439 QuorumPeerMain
 > 33434 Kafka
 > 11274 Main
+
+## 安装 mysql
+
+### 出错
+
+- “ubuntu 暂时不能解析域名 archive.ubuntu.com (ubuntu 源)
+  > dns 没有配置， 加入 dns 服务器地址
+  > vim /etc/resolv.conf 如 nameserver 202.96.134.133 nameserver 8.8.8.8 再重启网络服务 service network-manager restart 不要使用 service network restart 否则报错
